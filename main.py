@@ -1,12 +1,3 @@
-# Features
-
-# 1) /add Add Tasking To The Bot
-# 2) /clear_list Clear Entire To Do List - (maybe add a confirmation key)
-# 3) /reminder remind user at a certain time
-# 4) /clear_task clear single task
-# (followed by prompt to choose task to clear)
-# 5) /view see items in list
-
 import os
 
 from database import user
@@ -20,17 +11,10 @@ from telebot.types import (
 API_KEY = os.getenv('API_KEY')
 bot = telebot.TeleBot(API_KEY)
 
-# from threading import Thread
-# from time import sleep
-# import time, datetime
-# print(datetime.date.today().weekday())
-
-
 bot.set_my_commands([
     BotCommand('start', 'Start The Bot'),
     BotCommand('add', 'Add Tasking To the Bot'),
     BotCommand('clear_list', 'Clear Entire To Do List'),
-    BotCommand('remind', 'Remind User Of A Specific Task At A Certain Time'),
     BotCommand('view', 'View Entire List and Remove Specific Task')
 ])
 
@@ -55,6 +39,11 @@ def start(message):
         chat_user = message.chat.first_name
     else:
         chat_user = message.chat.title
+        
+    if chat_id in user:
+        bot.send_message(chat_id=chat_id, text='The bot has already started')
+        return
+    
     user[chat_id] = []
     message_text = f'Hello {chat_user} !'
     bot.reply_to(message, message_text)
@@ -74,16 +63,13 @@ def view(message):
     if (not user[chat_id]):
         chat_text = 'No outstanding tasks!'
         bot.send_message(
-            chat_id=chat_id,
-            text=chat_text
+          chat_id=chat_id, 
+          text=chat_text
         )
-        # bot.send_photo(chat_id=chat_id, photo=open('./gabby.jpg', 'rb'))
-        bot.send_photo(
-            chat_id=chat_id,
-            photo=open('./Images/gabby.jpg', 'rb'),
-            caption='So good like Gabby !'
+        bot.send_sticker(
+          chat_id=chat_id,
+          data='CAACAgUAAxkBAAEDoxZh2QABPhROPLwinyjqul0ut86dCpoAAgoCAAIcqWgDAnNxba4Na0kjBA'
         )
-
     else:
         chat_text = 'Outstanding tasks:'
 
